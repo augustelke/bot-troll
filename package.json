@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node index.js"
+    "start": "sh -c 'python3 spam.py & node index.js'"
   },
   "dependencies": {
     "discord.js": "^14.0.0"
