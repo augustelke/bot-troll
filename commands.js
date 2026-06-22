@@ -1,7 +1,16 @@
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
+} = require("discord.js");
+
+module.exports = [
 {
     data: new SlashCommandBuilder()
         .setName("commu")
-        .setDescription("Publie le bouton communauté"),
+        .setDescription("Publier le bouton communauté"),
 
     async execute(interaction) {
 
@@ -37,3 +46,4 @@
         });
     }
 }
+];
