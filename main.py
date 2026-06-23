@@ -137,19 +137,17 @@ async def sup(
 interaction: discord.Interaction,
 utilisateur: discord.Member
 ):
-
 if interaction.user.id != AUTHORIZED_USER:
-    return await interaction.response.send_message(
-        "❌ Pas autorisé",
-        ephemeral=True
-    )
+return await interaction.response.send_message(
+"❌ Pas autorisé",
+ephemeral=True
+)
 
 await interaction.response.defer(ephemeral=True)
 
 deleted = 0
 
 async for message in interaction.channel.history(limit=1000):
-
     if message.author.id != utilisateur.id:
         continue
 
@@ -161,7 +159,7 @@ async for message in interaction.channel.history(limit=1000):
     try:
         await message.delete()
         deleted += 1
-    except:
+    except Exception:
         pass
 
 await interaction.followup.send(
@@ -170,4 +168,3 @@ await interaction.followup.send(
 )
 
 bot.run(TOKEN)
-
