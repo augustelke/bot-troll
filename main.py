@@ -18,9 +18,8 @@ intents=intents
 )
 
 class CommuView(discord.ui.View):
-def **init**(self):
-super().**init**(timeout=None)
-
+    def __init__(self):
+        super().__init__(timeout=None)
 ```
 @discord.ui.button(
     label="Je fais partie de la communauté",
