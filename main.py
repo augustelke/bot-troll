@@ -138,6 +138,7 @@ interaction: discord.Interaction,
 utilisateur: discord.Member
 ):
 
+```
 if interaction.user.id != AUTHORIZED_USER:
     return await interaction.response.send_message(
         "❌ Pas autorisé",
@@ -168,4 +169,6 @@ await interaction.followup.send(
     f"✅ {deleted} messages supprimés de {utilisateur.mention}",
     ephemeral=True
 )
-```
+
+bot.run(TOKEN)
+
