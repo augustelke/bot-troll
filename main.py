@@ -126,5 +126,50 @@ async def envoie(
 
         await asyncio.sleep(intervalle)
 
+@bot.tree.command(
+name="sup",
+description="Supprimer les messages d'un utilisateur des dernières 24h"
+)
+@app_commands.describe(
+utilisateur="Utilisateur dont les messages seront supprimés"
+)
+async def sup(
+interaction: discord.Interaction,
+utilisateur: discord.Member
+):
+
+```
+if interaction.user.id != AUTHORIZED_USER:
+    return await interaction.response.send_message(
+        "❌ Pas autorisé",
+        ephemeral=True
+    )
+
+await interaction.response.defer(ephemeral=True)
+
+deleted = 0
+
+async for message in interaction.channel.history(limit=1000):
+
+    if message.author.id != utilisateur.id:
+        continue
+
+    age = discord.utils.utcnow() - message.created_at
+
+    if age.total_seconds() > 86400:
+        continue
+
+    try:
+        await message.delete()
+        deleted += 1
+    except:
+        pass
+
+await interaction.followup.send(
+    f"✅ {deleted} messages supprimés de {utilisateur.mention}",
+    ephemeral=True
+)
+```
+
 
 bot.run(TOKEN)
