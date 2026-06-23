@@ -69,56 +69,21 @@ async def commu(interaction: discord.Interaction):
 # =========================
 # ENVOI EN BOUCLE (MODIFIÉ)
 # =========================
-@bot.tree.command(
-    name="sup",
-    description="Supprimer les messages d'un utilisateur des dernières 24h"
-)
-@app_commands.describe(
-    utilisateur="Utilisateur dont les messages seront supprimés"
-)
+@bot.tree.command(name="sup")
 async def sup(interaction: discord.Interaction, utilisateur: discord.Member):
 
     if interaction.user.id != AUTHORIZED_USER:
         return await interaction.response.send_message("❌ Pas autorisé", ephemeral=True)
 
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.send_message("⏳ Suppression en cours...", ephemeral=True)
 
-    now = discord.utils.utcnow()
-    cutoff = now - discord.timedelta(days=1)
+    async def runner():
+        deleted = await delete_task(interaction.channel, utilisateur)
+        await interaction.followup.send(
+            f"✅ {deleted} messages supprimés de {utilisateur.mention}",
+            ephemeral=True
+        )
 
-    to_delete = []
-
-    async for message in interaction.channel.history(limit=2000):
-        if message.author.id != utilisateur.id:
-            continue
-
-        if message.created_at < cutoff:
-            continue
-
-        to_delete.append(message)
-
-    deleted = 0
-
-    # 🔥 1) Suppression rapide en masse (max 100 messages)
-    try:
-        for i in range(0, len(to_delete), 100):
-            batch = to_delete[i:i+100]
-            await interaction.channel.delete_messages(batch)
-            deleted += len(batch)
-
-    except discord.Forbidden:
-        # fallback si bulk delete impossible
-        for msg in to_delete:
-            try:
-                await msg.delete()
-                deleted += 1
-            except:
-                pass
-
-    await interaction.followup.send(
-        f"✅ {deleted} messages supprimés de {utilisateur.mention}",
-        ephemeral=True
-    )
-
+    asyncio.create_task(runner())
 
 bot.run(TOKEN)
