@@ -169,6 +169,3 @@ await interaction.followup.send(
     ephemeral=True
 )
 ```
-
-
-bot.run(TOKEN)
