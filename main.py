@@ -138,7 +138,6 @@ interaction: discord.Interaction,
 utilisateur: discord.Member
 ):
 
-```
 if interaction.user.id != AUTHORIZED_USER:
     return await interaction.response.send_message(
         "❌ Pas autorisé",
