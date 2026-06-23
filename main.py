@@ -69,99 +69,52 @@ async def commu(interaction: discord.Interaction):
 # =========================
 # ENVOI EN BOUCLE (MODIFIÉ)
 # =========================
-@bot.tree.command(name="envoie", description="Envoie un message en boucle dans un salon ou DM")
-@app_commands.describe(
-    cible="ID du salon ou ID utilisateur",
-    phrase="Message à envoyer",
-    intervalle="Intervalle en secondes",
-    nombre="Nombre de fois"
+@bot.tree.command(
+    name="sup",
+    description="Supprimer les messages d'un utilisateur des dernières 24h"
 )
-async def envoie(
-    interaction: discord.Interaction,
-    cible: str,
-    phrase: str,
-    intervalle: int,
-    nombre: int
-):
+@app_commands.describe(
+    utilisateur="Utilisateur dont les messages seront supprimés"
+)
+async def sup(interaction: discord.Interaction, utilisateur: discord.Member):
 
     if interaction.user.id != AUTHORIZED_USER:
         return await interaction.response.send_message("❌ Pas autorisé", ephemeral=True)
 
-    await interaction.response.send_message("✅ Envoi lancé", ephemeral=True)
-
-    channel = None
-    user = None
-
-    # -------------------------
-    # ESSAYE SALON
-    # -------------------------
-    try:
-        channel_id = int(cible)
-        channel = bot.get_channel(channel_id)
-    except:
-        pass
-
-    # -------------------------
-    # SI PAS SALON → USER
-    # -------------------------
-    if channel is None:
-        try:
-            user_id = int(cible)
-            user = await bot.fetch_user(user_id)
-        except:
-            return await interaction.followup.send("❌ ID invalide", ephemeral=True)
-
-    # -------------------------
-    # BOUCLE D'ENVOI
-    # -------------------------
-    for i in range(nombre):
-
-        try:
-            if channel:
-                await channel.send(phrase)
-            elif user:
-                await user.send(phrase)
-
-        except Exception as e:
-            print("Erreur envoi:", e)
-
-        await asyncio.sleep(intervalle)
-
-@bot.tree.command(
-name="sup",
-description="Supprimer les messages d'un utilisateur des dernières 24h"
-)
-@app_commands.describe(
-utilisateur="Utilisateur dont les messages seront supprimés"
-)
-async def sup(
-interaction: discord.Interaction,
-utilisateur: discord.Member
-):
-    if interaction.user.id != AUTHORIZED_USER:
-        return await interaction.response.send_message(
-            "❌ Pas autorisé",
-            ephemeral=True
-        )
     await interaction.response.defer(ephemeral=True)
 
-    deleted = 0
-    
-    async for message in interaction.channel.history(limit=10000):
+    now = discord.utils.utcnow()
+    cutoff = now - discord.timedelta(days=1)
+
+    to_delete = []
+
+    async for message in interaction.channel.history(limit=2000):
         if message.author.id != utilisateur.id:
             continue
-    
-        age = discord.utils.utcnow() - message.created_at
-    
-        if age.total_seconds() > 86400:
+
+        if message.created_at < cutoff:
             continue
-    
-        try:
-            await message.delete()
-            deleted += 1
-        except Exception:
-            pass
-    
+
+        to_delete.append(message)
+
+    deleted = 0
+
+    # 🔥 1) Suppression rapide en masse (max 100 messages)
+    try:
+        for i in range(0, len(to_delete), 100):
+            batch = to_delete[i:i+100]
+            await interaction.channel.delete_messages(batch)
+            deleted += len(batch)
+
+    except discord.Forbidden:
+        # fallback si bulk delete impossible
+        for msg in to_delete:
+            try:
+                await msg.delete()
+                deleted += 1
+            except:
+                pass
+
     await interaction.followup.send(
         f"✅ {deleted} messages supprimés de {utilisateur.mention}",
         ephemeral=True
