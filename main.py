@@ -147,7 +147,7 @@ utilisateur: discord.Member
 
     deleted = 0
     
-    async for message in interaction.channel.history(limit=1000):
+    async for message in interaction.channel.history(limit=10000):
         if message.author.id != utilisateur.id:
             continue
     
