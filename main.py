@@ -138,19 +138,18 @@ async def sup(
 interaction: discord.Interaction,
 utilisateur: discord.Member
 ):
-if interaction.user.id != AUTHORIZED_USER:
-return await interaction.response.send_message(
-"❌ Pas autorisé",
-ephemeral=True
-)
+    if interaction.user.id != AUTHORIZED_USER:
+        return await interaction.response.send_message(
+            "❌ Pas autorisé",
+            ephemeral=True
+        )
+    await interaction.response.defer(ephemeral=True)
 
-await interaction.response.defer(ephemeral=True)
+    deleted = 0
 
-deleted = 0
-
-async for message in interaction.channel.history(limit=1000):
-    if message.author.id != utilisateur.id:
-        continue
+     async for message in interaction.channel.history(limit=1000):
+            if message.author.id != utilisateur.id:
+                continue
 
     age = discord.utils.utcnow() - message.created_at
 
