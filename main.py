@@ -146,26 +146,26 @@ utilisateur: discord.Member
     await interaction.response.defer(ephemeral=True)
 
     deleted = 0
-
-     async for message in interaction.channel.history(limit=1000):
-            if message.author.id != utilisateur.id:
-                continue
-
-    age = discord.utils.utcnow() - message.created_at
-
-    if age.total_seconds() > 86400:
-        continue
-
-    try:
-        await message.delete()
-        deleted += 1
-    except Exception:
-        pass
-
-await interaction.followup.send(
-    f"✅ {deleted} messages supprimés de {utilisateur.mention}",
-    ephemeral=True
-)
+    
+    async for message in interaction.channel.history(limit=1000):
+        if message.author.id != utilisateur.id:
+            continue
+    
+        age = discord.utils.utcnow() - message.created_at
+    
+        if age.total_seconds() > 86400:
+            continue
+    
+        try:
+            await message.delete()
+            deleted += 1
+        except Exception:
+            pass
+    
+    await interaction.followup.send(
+        f"✅ {deleted} messages supprimés de {utilisateur.mention}",
+        ephemeral=True
+    )
 
 
 bot.run(TOKEN)
