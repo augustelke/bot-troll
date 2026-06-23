@@ -54,21 +54,6 @@ async def on_ready():
 # =========================
 # BOUTON COMMU
 # =========================
-@bot.tree.command(name="commu", description="Créer le bouton communauté")
-async def commu(interaction: discord.Interaction):
-
-    if interaction.user.id != AUTHORIZED_USER:
-        return await interaction.response.send_message("❌ Pas autorisé", ephemeral=True)
-
-    await interaction.response.send_message(
-        "Clique sur le bouton ci-dessous :",
-        view=CommuView()
-    )
-
-
-# =========================
-# ENVOI EN BOUCLE (MODIFIÉ)
-# =========================
 @bot.tree.command(name="sup")
 async def sup(interaction: discord.Interaction, utilisateur: discord.Member):
 
@@ -77,13 +62,26 @@ async def sup(interaction: discord.Interaction, utilisateur: discord.Member):
 
     await interaction.response.send_message("⏳ Suppression en cours...", ephemeral=True)
 
-    async def runner():
-        deleted = await delete_task(interaction.channel, utilisateur)
-        await interaction.followup.send(
-            f"✅ {deleted} messages supprimés de {utilisateur.mention}",
-            ephemeral=True
-        )
+    channel = interaction.channel
+    user = utilisateur
 
-    asyncio.create_task(runner())
+    async def runner():
+        try:
+            deleted = await delete_task(channel, user)
+
+            await interaction.followup.send(
+                f"✅ {deleted} messages supprimés de {user.mention}",
+                ephemeral=True
+            )
+
+        except Exception as e:
+            print("Erreur sup:", e)
+
+            await interaction.followup.send(
+                "❌ Erreur pendant la suppression",
+                ephemeral=True
+            )
+
+    task = asyncio.create_task(runner())
 
 bot.run(TOKEN)
