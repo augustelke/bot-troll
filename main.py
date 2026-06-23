@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 import discord
 from discord.ext import commands
@@ -128,7 +129,7 @@ async def envoie(interaction: discord.Interaction, cible: str, phrase: str, inte
 async def delete_task(channel, utilisateur):
 
     now = discord.utils.utcnow()
-    cutoff = now - discord.timedelta(days=1)
+    cutoff = now - timedelta(days=1)
 
     messages = []
 
