@@ -1,12 +1,1 @@
-{
-  "name": "discord-bot",
-  "version": "1.0.0",
-  "main": "index.js",
-  "type": "commonjs",
-  "scripts": {
-    "start": "sh -c 'python3 spam.py & node index.js'"
-  },
-  "dependencies": {
-    "discord.js": "^14.0.0"
-  }
-}
+
